@@ -32,23 +32,28 @@ class _ScrollViewportState extends State<ScrollViewport> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Positioned(
-            left: controller.position.dx,
-            top: controller.position.dy,
-            child: widget.child),
-        ...widget.children,
-      ],
-    );
+    return LayoutBuilder(builder: (ctx, constraint) {
+      controller.viewport = Size(constraint.maxWidth, constraint.maxHeight);
+      print('${controller.position}');
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+              left: controller.position.dx,
+              top: controller.position.dy,
+              child: widget.child),
+          ...widget.children,
+        ],
+      );
+    });
   }
 }
 
 class DesktopScrollWatcher extends StatefulWidget {
   final BidirectionalScrollController controller;
 
-  const DesktopScrollWatcher({required this.controller, Key? key}) : super(key: key);
+  const DesktopScrollWatcher({required this.controller, Key? key})
+      : super(key: key);
 
   @override
   State<DesktopScrollWatcher> createState() => _DesktopScrollWatcherState();
@@ -69,21 +74,28 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
         onKey: (value) {
           _isShiftKeyPressed = value.isShiftPressed;
 
-          if(value.logicalKey == LogicalKeyboardKey.arrowUp) {
+          if (!_isShiftKeyPressed) {
+            if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
+              // TODO
+            } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
+              // TODO
+            }
             // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.arrowDown) {
+          } else {
+            if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              // TODO
+            } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
+              // TODO
+            }
             // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.pageUp) {
+          }
+          if (value.logicalKey == LogicalKeyboardKey.pageUp) {
+            controller.pageUp();
+          } else if (value.logicalKey == LogicalKeyboardKey.pageDown) {
+            controller.pageDown();
+          } else if (value.logicalKey == LogicalKeyboardKey.home) {
             // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.pageDown) {
-            // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-            // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.arrowRight) {
-            // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.home) {
-            // TODO
-          } else if(value.logicalKey == LogicalKeyboardKey.end) {
+          } else if (value.logicalKey == LogicalKeyboardKey.end) {
             // TODO
           }
         },
@@ -95,6 +107,9 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
               print(event.scrollDelta);
             }
           },
+          onPointerDown: (event) {
+            _focusNode.requestFocus();
+          },
         ),
       ),
     );
@@ -103,6 +118,8 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
 
 class BidirectionalScrollController {
   var _position = Offset(0, 0);
+
+  Size viewport = Size(0, 0);
 
   final _controller = StreamController<Offset>();
 
@@ -133,6 +150,18 @@ class BidirectionalScrollController {
         _setPosition(pos);
       },
     );
+  }
+
+  void pageUp() {
+    double newY = position.dy + viewport.height;
+    // TODO if(newY > )
+    Offset newPosition = position + Offset(0, viewport.height);
+    animateTo(newPosition);
+  }
+
+  void pageDown() {
+    final newPosition = position + Offset(0, -viewport.height);
+    animateTo(newPosition);
   }
 
   void dispose() {
