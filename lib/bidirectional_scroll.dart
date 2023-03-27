@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:bidirectional_scroll/src/measure_size.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -34,14 +36,17 @@ class _ScrollViewportState extends State<ScrollViewport> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, constraint) {
       controller.viewportSize = Size(constraint.maxWidth, constraint.maxHeight);
-      print('${controller.position}');
       return Stack(
         clipBehavior: Clip.none,
         children: [
           Positioned(
               left: controller.position.dx,
               top: controller.position.dy,
-              child: widget.child),
+              child: MeasureSize(
+                  onChange: (value) {
+                    controller.contentSize = value;
+                  },
+                  child: widget.child)),
           ...widget.children,
         ],
       );
@@ -74,37 +79,57 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
         onKey: (value) {
           _isShiftKeyPressed = value.isShiftPressed;
 
-          if (!_isShiftKeyPressed) {
-            if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
-              // TODO
-            } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
-              // TODO
+          if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
+            controller.scrollUp();
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
+            controller.scrollDown();
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            controller.scrollLeft();
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
+            controller.scrollRight();
+          } else if (value.logicalKey == LogicalKeyboardKey.pageUp) {
+            if (_isShiftKeyPressed) {
+              controller.pageLeft();
+            } else {
+              controller.pageUp();
             }
-            // TODO
-          } else {
-            if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-              // TODO
-            } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-              // TODO
-            }
-            // TODO
-          }
-          if (value.logicalKey == LogicalKeyboardKey.pageUp) {
-            controller.pageUp();
           } else if (value.logicalKey == LogicalKeyboardKey.pageDown) {
-            controller.pageDown();
+            if (_isShiftKeyPressed) {
+              controller.pageRight();
+            } else {
+              controller.pageDown();
+            }
           } else if (value.logicalKey == LogicalKeyboardKey.home) {
-            // TODO
+            if (_isShiftKeyPressed) {
+              controller.scrollBegin();
+            } else {
+              controller.scrollTop();
+            }
           } else if (value.logicalKey == LogicalKeyboardKey.end) {
-            // TODO
+            if (_isShiftKeyPressed) {
+              controller.scrollEnd();
+            } else {
+              controller.scrollBottom();
+            }
           }
         },
         child: Listener(
           behavior: HitTestBehavior.translucent,
           onPointerSignal: (event) {
             if (event is PointerScrollEvent) {
-              // TODO
-              print(event.scrollDelta);
+              if(event.scrollDelta.dy.isNegative) {
+                if(_isShiftKeyPressed) {
+                  controller.scrollLeft();
+                } else {
+                  controller.scrollUp();
+                }
+              } else {
+                if(_isShiftKeyPressed) {
+                  controller.scrollRight();
+                } else {
+                  controller.scrollDown();
+                }
+              }
             }
           },
           onPointerDown: (event) {
@@ -117,59 +142,144 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
 }
 
 class BidirectionalScrollController {
-  var _position = Offset(0, 0);
+  var _position = const Offset(0, 0);
 
-  Size viewportSize = Size(0, 0);
+  var _viewportSize = const Size(0, 0);
 
-  Size contentSize = Size(0, 0);
+  var _contentSize = const Size(0, 0);
 
   final _controller = StreamController<Offset>();
+
+  var delta = const Point<double>(50, 50);
 
   late final Stream<Offset> stream = _controller.stream;
 
   _Tracker? _tracker;
 
+  BidirectionalScrollController({this.delta = const Point<double>(50, 50)});
+
   Offset get position => _position;
 
-  void _setPosition(Offset position) {
-    // TODO validate position
-    _position = position;
-    _controller.add(position);
+  Size get viewportSize => _viewportSize;
+
+  Size get contentSize => _contentSize;
+
+  set viewportSize(Size value) {
+    _viewportSize = value;
+    _setPosition(_position);
   }
 
-  void jumpTo(Offset position) {
+  set contentSize(Size value) {
+    _contentSize = value;
+    _setPosition(_position);
+  }
+
+  void _setPosition(Offset newPosition) {
+    newPosition = _clampOffset(
+        newPosition,
+        Offset(viewportSize.width - contentSize.width,
+            viewportSize.height - contentSize.height));
+    if (newPosition == position) return;
+    _position = newPosition;
+    _controller.add(newPosition);
+  }
+
+  void jumpTo(Offset newPosition) {
     _tracker?.cancel();
     _tracker = null;
-    _setPosition(position);
+    _setPosition(newPosition);
   }
 
-  void animateTo(Offset position) {
+  void animateTo(Offset newPosition) {
     _tracker?.cancel();
+    newPosition = _clampOffset(
+        newPosition,
+        Offset(viewportSize.width - contentSize.width,
+            viewportSize.height - contentSize.height));
+    if (newPosition == position) return;
     _tracker = _Tracker(
       start: _position,
-      target: position,
+      target: newPosition,
       callback: (pos) {
         _setPosition(pos);
       },
     );
   }
 
+  void scrollTop() {
+    animateTo(Offset(position.dx, 0));
+  }
+
+  void scrollBottom() {
+    animateTo(Offset(position.dx, viewportSize.height - contentSize.height));
+  }
+
+  void scrollBegin() {
+    animateTo(Offset(0, position.dy));
+  }
+
+  void scrollEnd() {
+    animateTo(Offset(viewportSize.width - contentSize.width, position.dy));
+  }
+
+  void scrollUp({double? amount}) {
+    amount ??= delta.y;
+    double newY = position.dy + amount;
+    animateTo(Offset(position.dx, newY));
+  }
+
+  void scrollDown({double? amount}) {
+    amount ??= delta.y;
+    double newY = position.dy - amount;
+    animateTo(Offset(position.dx, newY));
+  }
+
+  void scrollLeft({double? amount}) {
+    amount ??= delta.x;
+    double newX = position.dx + amount;
+    animateTo(Offset(newX, position.dy));
+  }
+
+  void scrollRight({double? amount}) {
+    amount ??= delta.y;
+    double newX = position.dx - amount;
+    animateTo(Offset(newX, position.dy));
+  }
+
   void pageUp() {
-    double newY = position.dy + viewportSize.height;
-    // TODO if(newY > )
-    Offset newPosition = position + Offset(0, viewportSize.height);
-    animateTo(newPosition);
+    scrollUp(amount: viewportSize.height);
   }
 
   void pageDown() {
-    final newPosition = position + Offset(0, -viewportSize.height);
-    animateTo(newPosition);
+    scrollDown(amount: viewportSize.height);
+  }
+
+  void pageLeft() {
+    scrollLeft(amount: viewportSize.width);
+  }
+
+  void pageRight() {
+    scrollRight(amount: viewportSize.width);
   }
 
   void dispose() {
     _tracker?.cancel();
     _controller.close();
   }
+}
+
+double _clamp(double value, double threshold) {
+  if (value > 0) {
+    return 0;
+  }
+  if (value < threshold) {
+    return threshold;
+  }
+  return value;
+}
+
+Offset _clampOffset(Offset value, Offset threshold) {
+  return Offset(_clamp(value.dx, threshold.dx), _clamp(value.dy, threshold.dy));
 }
 
 class _Tracker {
@@ -180,9 +290,13 @@ class _Tracker {
 
   _Tracker(
       {required this.start, required this.target, required this.callback}) {
-    timer = Timer.periodic(Duration(milliseconds: 50), (timer) {
-      callback(Offset.lerp(start, target, timer.tick / 20)!);
-      if (timer.tick >= 20) {
+    final distance = (start - target).distance;
+    timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      final pos =
+          Offset.lerp(start, target, min(timer.tick / (distance / 25), 1))!;
+      // print('${timer.tick/(distance/25)} $start $target $pos');
+      callback(pos);
+      if (pos == target) {
         timer.cancel();
       }
     });
