@@ -35,16 +35,22 @@ class _ScrollViewportState extends State<ScrollViewport> {
       controller.viewportSize = Size(constraint.maxWidth, constraint.maxHeight);
       return Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.topLeft,
         children: [
-          Positioned(
-            left: controller.position.dx,
-            top: controller.position.dy,
-            child: MeasureSize(
-                onChange: (value) {
-                  controller.contentSize = value;
-                },
-                child: Transform.scale(
-                    scale: controller.scale, child: widget.child)),
+          StreamBuilder(
+            builder: (ctx, _) => Positioned(
+              left: controller.position.dx,
+              top: controller.position.dy,
+              child: Transform.scale(
+                scale: controller.scale,
+                alignment: Alignment.topLeft,
+                child: MeasureSize(
+                    onChange: (value) {
+                      controller.contentOriginalSize = value;
+                    },
+                    child: widget.child),
+              ),
+            ),
           ),
           ...widget.children,
         ],

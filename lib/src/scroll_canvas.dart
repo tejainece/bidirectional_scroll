@@ -3,17 +3,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class DesktopScrollWatcher extends StatefulWidget {
+class ScrollerCanvas extends StatefulWidget {
   final ScrollerController controller;
 
-  const DesktopScrollWatcher({required this.controller, Key? key})
+  const ScrollerCanvas({required this.controller, Key? key})
       : super(key: key);
 
   @override
-  State<DesktopScrollWatcher> createState() => _DesktopScrollWatcherState();
+  State<ScrollerCanvas> createState() => _ScrollerCanvasState();
 }
 
-class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
+class _ScrollerCanvasState extends State<ScrollerCanvas> {
   final _focusNode = FocusNode();
 
   bool _isShiftKeyPressed = false;
@@ -29,6 +29,10 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
         onKey: (value) {
           _isShiftKeyPressed = value.isShiftPressed;
           _isControlKeyPressed = value.isControlPressed;
+
+          if (value is RawKeyUpEvent) {
+            return;
+          }
 
           if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
             controller.scrollUp();
@@ -71,7 +75,7 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
               if (event.scrollDelta.dy.isNegative) {
                 if (_isShiftKeyPressed) {
                   controller.scrollLeft();
-                } else if(_isControlKeyPressed) {
+                } else if (_isControlKeyPressed) {
                   controller.zoomIn();
                 } else {
                   controller.scrollUp();
@@ -79,7 +83,7 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
               } else {
                 if (_isShiftKeyPressed) {
                   controller.scrollRight();
-                } else if(_isControlKeyPressed) {
+                } else if (_isControlKeyPressed) {
                   controller.zoomOut();
                 } else {
                   controller.scrollDown();
@@ -94,7 +98,7 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
           },
           onPointerMove: (event) {
             if (event.down && _panTracker != null) {
-              controller.animateTo(
+              controller.jumpTo(
                   _panTracker!.anchor + (event.position - _panTracker!.start));
             }
           },

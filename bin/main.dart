@@ -16,30 +16,39 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       home: Scaffold(
         body: ScrollViewport(
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ...List.generate(
-                10,
-                (r) => Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: List.generate(
-                    10,
-                    (c) => Container(
-                        width: 200,
-                        height: 100,
-                        color: colors[(r + c) % colors.length]),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          const ContentWidget(),
           controller: controller,
           children: [
-            DesktopScrollWatcher(controller: controller),
+            ScrollerCanvas(controller: controller),
           ],
         ),
       ),
+    );
+  }
+}
+
+class ContentWidget extends StatelessWidget {
+  const ContentWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        ...List.generate(
+          10,
+          (r) => Row(
+            mainAxisSize: MainAxisSize.max,
+            children: List.generate(
+              10,
+              (c) => Container(
+                  width: 200,
+                  height: 100,
+                  color: colors[(r + c) % colors.length]),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

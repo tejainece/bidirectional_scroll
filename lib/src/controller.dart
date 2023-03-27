@@ -7,15 +7,17 @@ class ScrollerController {
 
   var _viewportSize = const Size(0, 0);
 
+  var _contentOriginalSize = const Size(0, 0);
+
   var _contentSize = const Size(0, 0);
 
-  final _controller = StreamController<Offset>();
+  final _controller = StreamController<ScrollerController>();
 
   var scrollDelta = const Offset(50, 50);
   double zoomDelta = 0.1;
   double _scale = 1.0;
 
-  late final Stream<Offset> stream = _controller.stream;
+  late final Stream<ScrollerController> stream = _controller.stream;
 
   _Tracker? _tracker;
 
@@ -28,23 +30,25 @@ class ScrollerController {
   Size get contentSize => _contentSize;
 
   set viewportSize(Size value) {
+    if (value == _viewportSize) return;
     _viewportSize = value;
     _setPosition(_position);
   }
 
-  set contentSize(Size value) {
-    _contentSize = value;
+  set contentOriginalSize(Size value) {
+    _contentOriginalSize = value;
+    _contentSize = _contentOriginalSize * scale;
     _setPosition(_position);
   }
 
   void _setPosition(Offset newPosition) {
     newPosition = _clampOffset(
         newPosition,
-        Offset(viewportSize.width - contentSize.width,
+        Offset(viewportSize.width - _contentSize.width,
             viewportSize.height - contentSize.height));
     if (newPosition == position) return;
     _position = newPosition;
-    _controller.add(newPosition);
+    _controller.add(this);
   }
 
   void jumpTo(Offset newPosition) {
@@ -130,25 +134,33 @@ class ScrollerController {
   void zoomIn({double? amount}) {
     amount ??= zoomDelta;
     _scale += amount;
+    contentOriginalSize = _contentOriginalSize;
+    _controller.add(this);
+    _setPosition(position);
   }
 
   void zoomOut({double? amount}) {
     amount ??= zoomDelta;
     _scale -= amount;
+    contentOriginalSize = _contentOriginalSize;
+    _controller.add(this);
+    _setPosition(position);
   }
 
   void dispose() {
     _tracker?.cancel();
     _controller.close();
+    _controller.add(this);
+    _setPosition(position);
   }
 }
 
 double _clamp(double value, double threshold) {
+  if (value < threshold) {
+    value = threshold;
+  }
   if (value > 0) {
     return 0;
-  }
-  if (value < threshold) {
-    return threshold;
   }
   return value;
 }
