@@ -33,7 +33,7 @@ class _ScrollViewportState extends State<ScrollViewport> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, constraint) {
-      controller.viewport = Size(constraint.maxWidth, constraint.maxHeight);
+      controller.viewportSize = Size(constraint.maxWidth, constraint.maxHeight);
       print('${controller.position}');
       return Stack(
         clipBehavior: Clip.none,
@@ -119,7 +119,9 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
 class BidirectionalScrollController {
   var _position = Offset(0, 0);
 
-  Size viewport = Size(0, 0);
+  Size viewportSize = Size(0, 0);
+
+  Size contentSize = Size(0, 0);
 
   final _controller = StreamController<Offset>();
 
@@ -153,14 +155,14 @@ class BidirectionalScrollController {
   }
 
   void pageUp() {
-    double newY = position.dy + viewport.height;
+    double newY = position.dy + viewportSize.height;
     // TODO if(newY > )
-    Offset newPosition = position + Offset(0, viewport.height);
+    Offset newPosition = position + Offset(0, viewportSize.height);
     animateTo(newPosition);
   }
 
   void pageDown() {
-    final newPosition = position + Offset(0, -viewport.height);
+    final newPosition = position + Offset(0, -viewportSize.height);
     animateTo(newPosition);
   }
 
