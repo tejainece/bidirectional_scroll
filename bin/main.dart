@@ -5,7 +5,7 @@ void main() {
   runApp(const MyApp());
 }
 
-final controller = BidirectionalScrollController();
+final controller = ScrollerController();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
