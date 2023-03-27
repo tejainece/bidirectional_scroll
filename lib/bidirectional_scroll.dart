@@ -117,14 +117,14 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
           behavior: HitTestBehavior.translucent,
           onPointerSignal: (event) {
             if (event is PointerScrollEvent) {
-              if(event.scrollDelta.dy.isNegative) {
-                if(_isShiftKeyPressed) {
+              if (event.scrollDelta.dy.isNegative) {
+                if (_isShiftKeyPressed) {
                   controller.scrollLeft();
                 } else {
                   controller.scrollUp();
                 }
               } else {
-                if(_isShiftKeyPressed) {
+                if (_isShiftKeyPressed) {
                   controller.scrollRight();
                 } else {
                   controller.scrollDown();
@@ -134,11 +134,30 @@ class _DesktopScrollWatcherState extends State<DesktopScrollWatcher> {
           },
           onPointerDown: (event) {
             _focusNode.requestFocus();
+            _panTracker =
+                _PanTracker(anchor: controller.position, start: event.position);
+          },
+          onPointerMove: (event) {
+            if (event.down && _panTracker != null) {
+              controller.animateTo(
+                  _panTracker!.anchor + (event.position - _panTracker!.start));
+            }
+          },
+          onPointerUp: (event) {
+            _panTracker = null;
           },
         ),
       ),
     );
   }
+
+  _PanTracker? _panTracker;
+}
+
+class _PanTracker {
+  final Offset anchor;
+  final Offset start;
+  _PanTracker({required this.anchor, required this.start});
 }
 
 class BidirectionalScrollController {
