@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +34,7 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final random = Random(4);
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -44,7 +47,7 @@ class ContentWidget extends StatelessWidget {
               (c) => Container(
                   width: 200,
                   height: 100,
-                  color: colors[(r + c) % colors.length]),
+                  color: colors[random.nextInt(colors.length)]),
             ),
           ),
         ),
@@ -59,5 +62,6 @@ final colors = [
   Colors.grey,
   Colors.orange,
   Colors.brown,
-  Colors.cyan
+  Colors.cyan,
+  Colors.indigo
 ];
