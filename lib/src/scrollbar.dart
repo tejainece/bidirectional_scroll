@@ -21,6 +21,7 @@ class VerticalScrollbar extends StatelessWidget {
               children: [
                 // TODO cursor
                 Positioned(
+                  top: _getTop(controller),
                   child: Container(
                     width: width,
                     height: _getHeight(controller),
@@ -41,6 +42,12 @@ class VerticalScrollbar extends StatelessWidget {
 }
 
 double _getHeight(ScrollerController controller) {
+  // TODO minimum height
   return (controller.viewportSize.height * controller.viewportSize.height) /
+      controller.contentSize.height;
+}
+
+double _getTop(ScrollerController controller) {
+  return (-controller.position.dy * controller.viewportSize.height) /
       controller.contentSize.height;
 }

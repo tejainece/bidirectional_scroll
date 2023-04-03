@@ -11,7 +11,7 @@ class ScrollerController {
 
   var _contentSize = const Size(0, 0);
 
-  final _controller = StreamController<ScrollerController>();
+  final _controller = StreamController<ScrollerController>.broadcast();
 
   var scrollDelta = const Offset(50, 50);
   double zoomDelta = 0.1;
