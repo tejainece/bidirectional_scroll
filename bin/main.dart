@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
-import 'package:bidirectional_scroll/src/scrollbar.dart';
+import 'package:bidirectional_scroll/src/horizontal_scrollbar.dart';
+import 'package:bidirectional_scroll/src/vertical_scrollbar.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,6 +25,10 @@ class MyApp extends StatelessWidget {
           children: [
             ScrollerCanvas(controller: controller),
             VerticalScrollbar(controller),
+            HorizontalScrollbar(controller,
+                trackDecoration: BoxDecoration(
+                    color: Colors.grey,
+                    border: Border.all(color: Colors.black))),
           ],
         ),
       ),

@@ -9,6 +9,7 @@ class VerticalScrollbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO hide scrollbar if not necessary
     return Positioned(
       top: 0,
       right: 0,
