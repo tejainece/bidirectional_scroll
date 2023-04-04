@@ -43,12 +43,14 @@ class VerticalScrollbar extends StatelessWidget {
 }
 
 double _getHeight(ScrollerController controller) {
+  if(controller.contentSize.height == 0) return controller.viewportSize.height;
   // TODO minimum height
   return (controller.viewportSize.height * controller.viewportSize.height) /
       controller.contentSize.height;
 }
 
 double _getTop(ScrollerController controller) {
+  if(controller.contentSize.height == 0) return controller.viewportSize.height;
   return (-controller.position.dy * controller.viewportSize.height) /
       controller.contentSize.height;
 }

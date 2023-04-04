@@ -46,12 +46,14 @@ class HorizontalScrollbar extends StatelessWidget {
 }
 
 double _getThumbWidth(ScrollerController controller) {
+  if(controller.contentSize.width == 0) return controller.viewportSize.width;
   // TODO minimum width
   return (controller.viewportSize.width * controller.viewportSize.width) /
       controller.contentSize.width;
 }
 
 double _getThumbLeft(ScrollerController controller) {
+  if(controller.contentSize.width == 0) return controller.viewportSize.width;
   return (-controller.position.dx * controller.viewportSize.width) /
       controller.contentSize.width;
 }

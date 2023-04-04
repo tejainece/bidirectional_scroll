@@ -6,8 +6,7 @@ import 'package:flutter/services.dart';
 class ScrollerCanvas extends StatefulWidget {
   final ScrollerController controller;
 
-  const ScrollerCanvas({required this.controller, Key? key})
-      : super(key: key);
+  const ScrollerCanvas({required this.controller, Key? key}) : super(key: key);
 
   @override
   State<ScrollerCanvas> createState() => _ScrollerCanvasState();
@@ -70,6 +69,15 @@ class _ScrollerCanvasState extends State<ScrollerCanvas> {
         },
         child: Listener(
           behavior: HitTestBehavior.translucent,
+          onPointerPanZoomStart: (event) {
+            _panTracker =
+                _PanTracker(anchor: controller.position, start: event.position);
+          },
+          onPointerPanZoomUpdate: (event) {
+            if (_panTracker != null) {
+              controller.jumpTo(_panTracker!.anchor + event.localPan);
+            }
+          },
           onPointerSignal: (event) {
             if (event is PointerScrollEvent) {
               if (event.scrollDelta.dy.isNegative) {
