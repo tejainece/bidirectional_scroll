@@ -64,7 +64,8 @@ class VerticalScrollbar extends StatelessWidget {
   double _getThumbHeight() {
     if (controller.contentSize.height == 0) return trackLength;
     // TODO minimum height
-    return (trackLength * trackLength) / controller.contentSize.height;
+    return ((controller.viewportSize.height * controller.viewportSize.height) /
+        controller.contentSize.height) * trackLength/controller.viewportSize.height;
   }
 
   double _getThumbTop() {
