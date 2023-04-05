@@ -32,23 +32,28 @@ class ScrollerController {
   set viewportSize(Size value) {
     if (value == _viewportSize) return;
     _viewportSize = value;
-    _setPosition(_position);
+    if(!_setPosition(_position)) {
+      _controller.add(this);
+    }
   }
 
   set contentOriginalSize(Size value) {
     _contentOriginalSize = value;
     _contentSize = _contentOriginalSize * scale;
-    _setPosition(_position);
+    if(!_setPosition(_position)) {
+      _controller.add(this);
+    }
   }
 
-  void _setPosition(Offset newPosition) {
+  bool _setPosition(Offset newPosition) {
     newPosition = _clampOffset(
         newPosition,
         Offset(viewportSize.width - _contentSize.width,
             viewportSize.height - contentSize.height));
-    if (newPosition == position) return;
+    if (newPosition == position) return false;
     _position = newPosition;
     _controller.add(this);
+    return true;
   }
 
   void jumpTo(Offset newPosition) {

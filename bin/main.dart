@@ -24,7 +24,10 @@ class MyApp extends StatelessWidget {
           controller: controller,
           children: [
             ScrollerCanvas(controller: controller),
-            VerticalScrollbar(controller),
+            VerticalScrollbar(controller, marginBottom: 100,
+                trackDecoration: BoxDecoration(
+                    color: Colors.grey,
+                    border: Border.all(color: Colors.black))),
             HorizontalScrollbar(controller,
                 trackDecoration: BoxDecoration(
                     color: Colors.grey,
