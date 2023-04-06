@@ -6,5 +6,4 @@ Bidirectional scroll widget for Flutter because Flutter framework devs are retar
 
 + Horizontal scrollbar mouse control
 + Vertical scrollbar mouse control
-+ Scrollbar margins
 + Scroll canvas margins
