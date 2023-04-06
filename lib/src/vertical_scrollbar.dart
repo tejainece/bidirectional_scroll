@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 class VerticalScrollbar extends StatelessWidget {
   final ScrollerController controller;
   final double width;
+  final Decoration? trackDecoration;
   final double marginTop;
   final double marginBottom;
   final double? offsetRight;
   final double? offsetLeft;
-  final Decoration? trackDecoration;
   const VerticalScrollbar(this.controller,
       {this.width = 25,
       this.marginTop = 0,
@@ -30,7 +30,6 @@ class VerticalScrollbar extends StatelessWidget {
       right: offsetRight,
       child: StreamBuilder(
         builder: (context, snapshot) {
-          print('redrawing vertical scrollbar');
           return Container(
             width: width,
             height: trackLength,
@@ -61,16 +60,20 @@ class VerticalScrollbar extends StatelessWidget {
   double get trackLength =>
       max(controller.viewportSize.height - marginTop - marginBottom, 0);
 
+  double get trackProportion => trackLength / controller.viewportSize.height;
+
   double _getThumbHeight() {
     if (controller.contentSize.height == 0) return trackLength;
     // TODO minimum height
-    return ((controller.viewportSize.height * controller.viewportSize.height) /
-        controller.contentSize.height) * trackLength/controller.viewportSize.height;
+    return controller.viewportSize.height *
+        controller.heightProportion *
+        trackProportion;
   }
 
   double _getThumbTop() {
     if (controller.contentSize.height == 0) return trackLength;
-    return (-controller.position.dy * controller.viewportSize.height) /
-        controller.contentSize.height;
+    return -controller.position.dy *
+        controller.heightProportion *
+        trackProportion;
   }
 }

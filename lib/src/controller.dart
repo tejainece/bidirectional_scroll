@@ -29,10 +29,14 @@ class ScrollerController {
 
   Size get contentSize => _contentSize;
 
+  double get widthProportion => viewportSize.width / contentSize.width;
+  double get heightProportion =>
+      viewportSize.height / contentSize.height;
+
   set viewportSize(Size value) {
     if (value == _viewportSize) return;
     _viewportSize = value;
-    if(!_setPosition(_position)) {
+    if (!_setPosition(_position)) {
       _controller.add(this);
     }
   }
@@ -40,7 +44,7 @@ class ScrollerController {
   set contentOriginalSize(Size value) {
     _contentOriginalSize = value;
     _contentSize = _contentOriginalSize * scale;
-    if(!_setPosition(_position)) {
+    if (!_setPosition(_position)) {
       _controller.add(this);
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:flutter/material.dart';
 
@@ -5,29 +7,40 @@ class HorizontalScrollbar extends StatelessWidget {
   final ScrollerController controller;
   final double height;
   final Decoration? trackDecoration;
+  final double marginLeft;
+  final double marginRight;
+  final double? offsetTop;
+  final double? offsetBottom;
   const HorizontalScrollbar(this.controller,
-      {this.trackDecoration, this.height = 25, Key? key})
+      {this.trackDecoration,
+      this.height = 25,
+      this.marginLeft = 0,
+      this.marginRight = 0,
+      this.offsetTop,
+      this.offsetBottom = 0,
+      Key? key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // TODO hide scrollbar if not necessary
     return Positioned(
-      bottom: 0,
-      left: 0,
+      top: offsetTop,
+      bottom: offsetBottom,
+      left: marginLeft,
       child: StreamBuilder(
         builder: (context, snapshot) {
           return Container(
-            width: controller.viewportSize.width,
+            width: trackLength,
             height: height,
             decoration: trackDecoration,
             child: Stack(
               children: [
                 // TODO cursor
                 Positioned(
-                  left: _getThumbLeft(controller),
+                  left: _getThumbLeft(),
                   child: Container(
-                    width: _getThumbWidth(controller),
+                    width: _getThumbWidth(),
                     height: height,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(height / 2),
@@ -43,17 +56,24 @@ class HorizontalScrollbar extends StatelessWidget {
       ),
     );
   }
-}
 
-double _getThumbWidth(ScrollerController controller) {
-  if(controller.contentSize.width == 0) return controller.viewportSize.width;
-  // TODO minimum width
-  return (controller.viewportSize.width * controller.viewportSize.width) /
-      controller.contentSize.width;
-}
+  double get trackLength =>
+      max(controller.viewportSize.height - marginLeft - marginRight, 0);
 
-double _getThumbLeft(ScrollerController controller) {
-  if(controller.contentSize.width == 0) return controller.viewportSize.width;
-  return (-controller.position.dx * controller.viewportSize.width) /
-      controller.contentSize.width;
+  double get trackProportion => trackLength / controller.viewportSize.width;
+
+  double _getThumbWidth() {
+    if (controller.contentSize.width == 0) return trackLength;
+    // TODO minimum height
+    return controller.viewportSize.width *
+        controller.widthProportion *
+        trackProportion;
+  }
+
+  double _getThumbLeft() {
+    if (controller.contentSize.width == 0) return trackLength;
+    return -controller.position.dx *
+        controller.widthProportion *
+        trackProportion;
+  }
 }

@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
                     color: Colors.grey,
                     border: Border.all(color: Colors.black))),
             HorizontalScrollbar(controller,
+                marginRight: 50,
                 trackDecoration: BoxDecoration(
                     color: Colors.grey,
                     border: Border.all(color: Colors.black))),
