@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
-import 'package:bidirectional_scroll/src/vertical_scrollbar.dart';
 import 'package:flutter/material.dart';
 
 void main() {

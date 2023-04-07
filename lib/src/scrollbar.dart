@@ -45,47 +45,56 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
       right: offsetRight,
       child: StreamBuilder(
         builder: (context, snapshot) {
-          return Container(
-            width: width,
-            height: trackLength,
-            decoration: trackDecoration,
-            child: Stack(
-              children: [
-                // TODO cursor
-                Positioned(
-                  top: _getThumbTop(),
-                  child: Listener(
-                    onPointerDown: (event) {
-                      if (event.buttons == 0) {
-                        // TODO
-                        return;
-                      }
-                      _panTracker = _PanTracker(
-                          anchor: controller.position,
-                          start: event.position.dy);
-                    },
-                    onPointerMove: (event) {
-                      if (event.buttons == 0 || _panTracker == null) return;
-                      controller.jumpTo(_panTracker!.anchor -
-                          Offset(0, event.position.dy - _panTracker!.start));
-                    },
-                    onPointerCancel: (event) {
-                      _panTracker = null;
-                    },
-                    onPointerUp: (event) {
-                      _panTracker = null;
-                    },
-                    child: Container(
-                      width: width,
-                      height: _getThumbHeight(),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(width / 2),
-                        color: Colors.black,
+          return Listener(
+            onPointerUp: (event) {
+              controller.animateTo(Offset(
+                  controller.position.dx,
+                  -event.localPosition.dy *
+                      controller.contentSize.height /
+                      trackLength));
+            },
+            child: Container(
+              width: width,
+              height: trackLength,
+              decoration: trackDecoration,
+              child: Stack(
+                children: [
+                  // TODO cursor
+                  Positioned(
+                    top: _getThumbTop(),
+                    child: Listener(
+                      onPointerDown: (event) {
+                        if (event.buttons == 0) {
+                          // TODO
+                          return;
+                        }
+                        _panTracker = _PanTracker(
+                            anchor: controller.position,
+                            start: event.position.dy);
+                      },
+                      onPointerMove: (event) {
+                        if (event.buttons == 0 || _panTracker == null) return;
+                        controller.jumpTo(_panTracker!.anchor -
+                            Offset(0, event.position.dy - _panTracker!.start));
+                      },
+                      onPointerCancel: (event) {
+                        _panTracker = null;
+                      },
+                      onPointerUp: (event) {
+                        _panTracker = null;
+                      },
+                      child: Container(
+                        width: width,
+                        height: _getThumbHeight(),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(width / 2),
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           );
         },
@@ -158,47 +167,56 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
       left: marginLeft,
       child: StreamBuilder(
         builder: (context, snapshot) {
-          return Container(
-            width: trackLength,
-            height: height,
-            decoration: trackDecoration,
-            child: Stack(
-              children: [
-                // TODO cursor
-                Positioned(
-                  left: _getThumbLeft(),
-                  child: Listener(
-                    onPointerDown: (event) {
-                      if (event.buttons == 0) {
-                        // TODO
-                        return;
-                      }
-                      _panTracker = _PanTracker(
-                          anchor: controller.position,
-                          start: event.position.dx);
-                    },
-                    onPointerMove: (event) {
-                      if (event.buttons == 0 || _panTracker == null) return;
-                      controller.jumpTo(_panTracker!.anchor -
-                          Offset(0, event.position.dx - _panTracker!.start));
-                    },
-                    onPointerCancel: (event) {
-                      _panTracker = null;
-                    },
-                    onPointerUp: (event) {
-                      _panTracker = null;
-                    },
-                    child: Container(
-                      width: _getThumbWidth(),
-                      height: height,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(height / 2),
-                        color: Colors.black,
+          return Listener(
+            onPointerUp: (event) {
+              controller.animateTo(Offset(
+                  -event.localPosition.dx *
+                      controller.contentSize.width /
+                      trackLength,
+                  controller.position.dy));
+            },
+            child: Container(
+              width: trackLength,
+              height: height,
+              decoration: trackDecoration,
+              child: Stack(
+                children: [
+                  // TODO cursor
+                  Positioned(
+                    left: _getThumbLeft(),
+                    child: Listener(
+                      onPointerDown: (event) {
+                        if (event.buttons == 0) {
+                          // TODO
+                          return;
+                        }
+                        _panTracker = _PanTracker(
+                            anchor: controller.position,
+                            start: event.position.dx);
+                      },
+                      onPointerMove: (event) {
+                        if (event.buttons == 0 || _panTracker == null) return;
+                        controller.jumpTo(_panTracker!.anchor -
+                            Offset(event.position.dx - _panTracker!.start, 0));
+                      },
+                      onPointerCancel: (event) {
+                        _panTracker = null;
+                      },
+                      onPointerUp: (event) {
+                        _panTracker = null;
+                      },
+                      child: Container(
+                        width: _getThumbWidth(),
+                        height: height,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(height / 2),
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           );
         },
