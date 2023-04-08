@@ -32,8 +32,7 @@ class _ScrollViewportState extends State<ScrollViewport> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, constraint) {
-      print('viewport resize');
-      controller.viewportSize = Size(constraint.maxWidth, constraint.maxHeight);
+      controller.viewportOriginalSize = Size(constraint.maxWidth, constraint.maxHeight);
       return Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topLeft,

@@ -7,7 +7,7 @@ void main() {
   runApp(const MyApp());
 }
 
-final controller = ScrollerController();
+final controller = ScrollerController(marginBottom: 25, marginRight: 25);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -22,12 +22,12 @@ class MyApp extends StatelessWidget {
           controller: controller,
           children: [
             ScrollerCanvas(controller: controller),
-            VerticalScrollbar(controller, marginBottom: 50,
+            VerticalScrollbar(controller, marginBottom: 25,
                 trackDecoration: BoxDecoration(
                     color: Colors.grey,
                     border: Border.all(color: Colors.black))),
             HorizontalScrollbar(controller,
-                marginRight: 50,
+                marginRight: 25,
                 trackDecoration: BoxDecoration(
                     color: Colors.grey,
                     border: Border.all(color: Colors.black))),

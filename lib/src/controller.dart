@@ -5,8 +5,6 @@ import 'dart:ui';
 class ScrollerController {
   var _position = const Offset(0, 0);
 
-  var _viewportSize = const Size(0, 0);
-
   var _contentOriginalSize = const Size(0, 0);
 
   var _contentSize = const Size(0, 0);
@@ -21,25 +19,79 @@ class ScrollerController {
 
   _Tracker? _tracker;
 
-  ScrollerController({this.scrollDelta = const Offset(50, 50)});
+  ScrollerController(
+      {this.scrollDelta = const Offset(50, 50),
+      double marginTop = 0,
+      double marginBottom = 0,
+      double marginLeft = 0,
+      double marginRight = 0}) {
+    this.marginTop = marginTop;
+    this.marginBottom = marginBottom;
+    this.marginLeft = marginLeft;
+    this.marginRight = marginRight;
+  }
 
   Offset get position => _position;
 
-  Size get viewportSize => _viewportSize;
+  double _marginTop = 0;
+  double _marginBottom = 0;
+  double _marginLeft = 0;
+  double _marginRight = 0;
 
-  Size get contentSize => _contentSize;
-
-  double get widthProportion => viewportSize.width / contentSize.width;
-  double get heightProportion =>
-      viewportSize.height / contentSize.height;
-
-  set viewportSize(Size value) {
-    if (value == _viewportSize) return;
-    _viewportSize = value;
+  set marginLeft(double value) {
+    assert(value >= 0);
+    if (value == _marginLeft) return;
+    _marginLeft = value;
     if (!_setPosition(_position)) {
       _controller.add(this);
     }
   }
+
+  set marginRight(double value) {
+    assert(value >= 0);
+    if (value == _marginRight) return;
+    _marginRight = value;
+    if (!_setPosition(_position)) {
+      _controller.add(this);
+    }
+  }
+
+  set marginTop(double value) {
+    assert(value >= 0);
+    if (value == _marginTop) return;
+    _marginTop = value;
+    if (!_setPosition(_position)) {
+      _controller.add(this);
+    }
+  }
+
+  set marginBottom(double value) {
+    assert(value >= 0);
+    if (value == _marginBottom) return;
+    _marginBottom = value;
+    if (!_setPosition(_position)) {
+      _controller.add(this);
+    }
+  }
+
+  var _viewportOriginalSize = const Size(0, 0);
+
+  set viewportOriginalSize(Size value) {
+    if (value == _viewportOriginalSize) return;
+    _viewportOriginalSize = value;
+    if (!_setPosition(_position)) {
+      _controller.add(this);
+    }
+  }
+
+  Size get viewportSize => Size(
+      _viewportOriginalSize.width - _marginLeft - _marginRight,
+      _viewportOriginalSize.height - _marginTop - _marginBottom);
+
+  Size get contentSize => _contentSize;
+
+  double get widthProportion => viewportSize.width / contentSize.width;
+  double get heightProportion => viewportSize.height / contentSize.height;
 
   set contentOriginalSize(Size value) {
     _contentOriginalSize = value;

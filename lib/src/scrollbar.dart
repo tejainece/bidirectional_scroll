@@ -46,6 +46,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
       child: StreamBuilder(
         builder: (context, snapshot) {
           return Listener(
+            behavior: HitTestBehavior.opaque,
             onPointerUp: (event) {
               controller.animateTo(Offset(
                   controller.position.dx,
@@ -63,6 +64,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
                   Positioned(
                     top: _getThumbTop(),
                     child: Listener(
+                      behavior: HitTestBehavior.opaque,
                       onPointerDown: (event) {
                         if (event.buttons == 0) {
                           // TODO
@@ -168,6 +170,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
       child: StreamBuilder(
         builder: (context, snapshot) {
           return Listener(
+            behavior: HitTestBehavior.opaque,
             onPointerUp: (event) {
               controller.animateTo(Offset(
                   -event.localPosition.dx *
@@ -185,6 +188,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
                   Positioned(
                     left: _getThumbLeft(),
                     child: Listener(
+                      behavior: HitTestBehavior.opaque,
                       onPointerDown: (event) {
                         if (event.buttons == 0) {
                           // TODO
@@ -226,7 +230,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
   }
 
   double get trackLength =>
-      max(controller.viewportSize.height - marginLeft - marginRight, 0);
+      max(controller.viewportSize.width - marginLeft - marginRight, 0);
 
   double get trackProportion => trackLength / controller.viewportSize.width;
 
