@@ -35,6 +35,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
   double? get offsetLeft => widget.offsetLeft;
 
   _PanTracker? _panTracker;
+  int _pointer = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +49,8 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
           return Listener(
             behavior: HitTestBehavior.opaque,
             onPointerUp: (event) {
-              controller.animateTo(Offset(
-                  controller.position.dx,
-                  -event.localPosition.dy *
-                      controller.contentSize.height /
-                      trackLength));
+              if (_pointer == event.pointer) return;
+              _jumpTo(event.localPosition.dy);
             },
             child: Container(
               width: width,
@@ -66,6 +64,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
                     child: Listener(
                       behavior: HitTestBehavior.opaque,
                       onPointerDown: (event) {
+                        _pointer = event.pointer;
                         if (event.buttons == 0) {
                           // TODO
                           return;
@@ -75,14 +74,17 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
                             start: event.position.dy);
                       },
                       onPointerMove: (event) {
+                        _pointer = event.pointer;
                         if (event.buttons == 0 || _panTracker == null) return;
                         controller.jumpTo(_panTracker!.anchor -
                             Offset(0, event.position.dy - _panTracker!.start));
                       },
                       onPointerCancel: (event) {
+                        _pointer = event.pointer;
                         _panTracker = null;
                       },
                       onPointerUp: (event) {
+                        _pointer = event.pointer;
                         _panTracker = null;
                       },
                       child: Container(
@@ -103,6 +105,14 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
         stream: controller.stream,
       ),
     );
+  }
+
+  void _jumpTo(double value) {
+    if (value > _getThumbTop()) {
+      value -= _getThumbHeight();
+    }
+    controller.animateTo(Offset(controller.position.dx,
+        -value * controller.contentSize.height / trackLength));
   }
 
   double get trackLength =>
@@ -159,6 +169,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
   double? get offsetBottom => widget.offsetBottom;
 
   _PanTracker? _panTracker;
+  int _pointer = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -172,11 +183,8 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
           return Listener(
             behavior: HitTestBehavior.opaque,
             onPointerUp: (event) {
-              controller.animateTo(Offset(
-                  -event.localPosition.dx *
-                      controller.contentSize.width /
-                      trackLength,
-                  controller.position.dy));
+              if (_pointer == event.pointer) return;
+              _jumpTo(event.localPosition.dx);
             },
             child: Container(
               width: trackLength,
@@ -190,6 +198,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
                     child: Listener(
                       behavior: HitTestBehavior.opaque,
                       onPointerDown: (event) {
+                        _pointer = event.pointer;
                         if (event.buttons == 0) {
                           // TODO
                           return;
@@ -199,14 +208,17 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
                             start: event.position.dx);
                       },
                       onPointerMove: (event) {
+                        _pointer = event.pointer;
                         if (event.buttons == 0 || _panTracker == null) return;
                         controller.jumpTo(_panTracker!.anchor -
                             Offset(event.position.dx - _panTracker!.start, 0));
                       },
                       onPointerCancel: (event) {
+                        _pointer = event.pointer;
                         _panTracker = null;
                       },
                       onPointerUp: (event) {
+                        _pointer = event.pointer;
                         _panTracker = null;
                       },
                       child: Container(
@@ -227,6 +239,15 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
         stream: controller.stream,
       ),
     );
+  }
+
+  void _jumpTo(double value) {
+    if (value > _getThumbLeft()) {
+      value -= _getThumbWidth();
+    }
+    controller.animateTo(Offset(
+        -value * controller.contentSize.width / trackLength,
+        controller.position.dy));
   }
 
   double get trackLength =>

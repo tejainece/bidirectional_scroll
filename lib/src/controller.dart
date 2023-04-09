@@ -75,6 +75,7 @@ class ScrollerController {
   }
 
   var _viewportOriginalSize = const Size(0, 0);
+  Size get viewportOriginalSize => _viewportOriginalSize;
 
   set viewportOriginalSize(Size value) {
     if (value == _viewportOriginalSize) return;
