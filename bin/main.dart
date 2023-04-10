@@ -79,7 +79,7 @@ class ContentWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       children: [
         ...List.generate(
-          10,
+          5,
           (r) => Row(
             mainAxisSize: MainAxisSize.max,
             children: List.generate(

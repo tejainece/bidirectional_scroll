@@ -4,4 +4,6 @@ Bidirectional scroll widget for Flutter because Flutter framework devs are retar
 
 # TODO
 
-+ Scroll canvas margins
++ Autohide scrollbars
++ Custom scrollbar track
++ Hide scrollbar when cant scroll
