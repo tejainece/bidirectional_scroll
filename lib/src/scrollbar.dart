@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:flutter/material.dart';
 
+typedef ThumbMaker = Widget Function(
+    ScrollerController controller, double trackWidth, double thumbLength);
+
 class VerticalScrollbar extends StatefulWidget {
   final ScrollerController controller;
   final double width;
@@ -11,6 +14,7 @@ class VerticalScrollbar extends StatefulWidget {
   final double marginBottom;
   final double? offsetRight;
   final double? offsetLeft;
+  final dynamic /* Widget | ThumbMaker */ thumb;
   const VerticalScrollbar(this.controller,
       {this.width = 25,
       this.marginTop = 0,
@@ -18,6 +22,7 @@ class VerticalScrollbar extends StatefulWidget {
       this.offsetLeft,
       this.offsetRight = 0,
       this.trackDecoration,
+      this.thumb,
       Key? key})
       : super(key: key);
 
@@ -87,14 +92,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
                         _pointer = event.pointer;
                         _panTracker = null;
                       },
-                      child: Container(
-                        width: width,
-                        height: _getThumbHeight(),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(width / 2),
-                          color: Colors.black,
-                        ),
-                      ),
+                      child: makeThumb(),
                     ),
                   )
                 ],
@@ -107,6 +105,19 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
     );
   }
 
+  Widget makeThumb() => widget.thumb == null
+      ? Container(
+          width: width,
+          height: _getThumbHeight(),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(width / 2),
+            color: Colors.black,
+          ),
+        )
+      : widget.thumb is ThumbMaker
+          ? widget.thumb(controller, width, _getThumbHeight())
+          : widget.thumb;
+
   void _jumpTo(double value) {
     if (value > _getThumbTop()) {
       value -= _getThumbHeight();
@@ -116,7 +127,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
   }
 
   double get trackLength =>
-      max(controller.viewportSize.height - marginTop - marginBottom, 0);
+      max(controller.viewportOriginalSize.height - marginTop - marginBottom, 0);
 
   double get trackProportion => trackLength / controller.viewportSize.height;
 
@@ -144,14 +155,16 @@ class HorizontalScrollbar extends StatefulWidget {
   final double marginRight;
   final double? offsetTop;
   final double? offsetBottom;
+  final dynamic /* Widget | ThumbMaker */ thumb;
 
   const HorizontalScrollbar(this.controller,
-      {this.trackDecoration,
-      this.height = 25,
+      {this.height = 25,
       this.marginLeft = 0,
       this.marginRight = 0,
       this.offsetTop,
       this.offsetBottom = 0,
+      this.trackDecoration,
+      this.thumb,
       Key? key})
       : super(key: key);
 
@@ -221,14 +234,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
                         _pointer = event.pointer;
                         _panTracker = null;
                       },
-                      child: Container(
-                        width: _getThumbWidth(),
-                        height: height,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(height / 2),
-                          color: Colors.black,
-                        ),
-                      ),
+                      child: makeThumb(),
                     ),
                   )
                 ],
@@ -241,6 +247,19 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
     );
   }
 
+  Widget makeThumb() => widget.thumb == null
+      ? Container(
+    width: height,
+    height: _getThumbWidth(),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(height / 2),
+      color: Colors.black,
+    ),
+  )
+      : widget.thumb is ThumbMaker
+      ? widget.thumb(controller, height, _getThumbWidth())
+      : widget.thumb;
+
   void _jumpTo(double value) {
     if (value > _getThumbLeft()) {
       value -= _getThumbWidth();
@@ -251,7 +270,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
   }
 
   double get trackLength =>
-      max(controller.viewportSize.width - marginLeft - marginRight, 0);
+      max(controller.viewportOriginalSize.width - marginLeft - marginRight, 0);
 
   double get trackProportion => trackLength / controller.viewportSize.width;
 
