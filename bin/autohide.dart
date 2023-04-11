@@ -8,13 +8,11 @@ void main() {
 }
 
 const double scrollbarWidth = 8;
-final controller = ScrollerController(
-    marginBottom: scrollbarWidth, marginRight: scrollbarWidth);
+final controller = ScrollerController();
 final trackDecoration = BoxDecoration(
     color: const Color.fromRGBO(215, 215, 215, 1),
     border: Border.all(color: Colors.black54),
     borderRadius: BorderRadius.circular(scrollbarWidth / 2));
-
 Widget vThumbMaker(
         ScrollerController controller, double trackWidth, double thumbLength) =>
     Container(
@@ -45,7 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Scroller basic',
+      title: 'Scroller autohide',
       home: Scaffold(
         body: ScrollViewport(
           const ContentWidget(),
@@ -55,12 +53,14 @@ class MyApp extends StatelessWidget {
             VerticalScrollbar(controller,
                 width: scrollbarWidth,
                 trackDecoration: trackDecoration,
-                thumb: vThumbMaker),
+                thumb: vThumbMaker,
+                autoHide: true),
             HorizontalScrollbar(controller,
                 height: scrollbarWidth,
                 marginRight: scrollbarWidth,
                 trackDecoration: trackDecoration,
-                thumb: hThumbMaker),
+                thumb: hThumbMaker,
+                autoHide: true),
           ],
         ),
       ),

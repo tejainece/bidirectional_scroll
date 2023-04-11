@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
@@ -15,6 +16,7 @@ class VerticalScrollbar extends StatefulWidget {
   final double? offsetRight;
   final double? offsetLeft;
   final dynamic /* Widget | ThumbMaker */ thumb;
+  final bool autoHide;
   const VerticalScrollbar(this.controller,
       {this.width = 25,
       this.marginTop = 0,
@@ -23,6 +25,7 @@ class VerticalScrollbar extends StatefulWidget {
       this.offsetRight = 0,
       this.trackDecoration,
       this.thumb,
+      this.autoHide = false,
       Key? key})
       : super(key: key);
 
@@ -42,6 +45,37 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
   _PanTracker? _panTracker;
   int _pointer = -1;
 
+  bool _show = true;
+  Timer? _timer;
+  late final StreamSubscription _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = controller.stream.listen((event) {
+      _timer?.cancel();
+      setState(() {
+        _show = true;
+      });
+      if (widget.autoHide) {
+        _timer = Timer(const Duration(seconds: 5), () {
+          if (widget.autoHide) {
+            setState(() {
+              _show = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _sub.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO hide scrollbar if not necessary
@@ -51,6 +85,7 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
       right: offsetRight,
       child: StreamBuilder(
         builder: (context, snapshot) {
+          if (!_show) return Container();
           return Listener(
             behavior: HitTestBehavior.opaque,
             onPointerUp: (event) {
@@ -156,6 +191,7 @@ class HorizontalScrollbar extends StatefulWidget {
   final double? offsetTop;
   final double? offsetBottom;
   final dynamic /* Widget | ThumbMaker */ thumb;
+  final bool autoHide;
 
   const HorizontalScrollbar(this.controller,
       {this.height = 25,
@@ -165,6 +201,7 @@ class HorizontalScrollbar extends StatefulWidget {
       this.offsetBottom = 0,
       this.trackDecoration,
       this.thumb,
+      this.autoHide = false,
       Key? key})
       : super(key: key);
 
@@ -184,6 +221,37 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
   _PanTracker? _panTracker;
   int _pointer = -1;
 
+  bool _show = true;
+  Timer? _timer;
+  late final StreamSubscription _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = controller.stream.listen((event) {
+      _timer?.cancel();
+      setState(() {
+        _show = true;
+      });
+      if (widget.autoHide) {
+        _timer = Timer(const Duration(seconds: 5), () {
+          if (widget.autoHide) {
+            setState(() {
+              _show = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _sub.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO hide scrollbar if not necessary
@@ -193,6 +261,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
       left: marginLeft,
       child: StreamBuilder(
         builder: (context, snapshot) {
+          if (!_show) return Container();
           return Listener(
             behavior: HitTestBehavior.opaque,
             onPointerUp: (event) {
@@ -249,16 +318,16 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
 
   Widget makeThumb() => widget.thumb == null
       ? Container(
-    width: height,
-    height: _getThumbWidth(),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(height / 2),
-      color: Colors.black,
-    ),
-  )
+          width: height,
+          height: _getThumbWidth(),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(height / 2),
+            color: Colors.black,
+          ),
+        )
       : widget.thumb is ThumbMaker
-      ? widget.thumb(controller, height, _getThumbWidth())
-      : widget.thumb;
+          ? widget.thumb(controller, height, _getThumbWidth())
+          : widget.thumb;
 
   void _jumpTo(double value) {
     if (value > _getThumbLeft()) {

@@ -1,6 +1,6 @@
 # bidirectional_scroll
 
-Bidirectional scroll widget for Flutter because Flutter framework devs are retarded
+A flexible, highly customizable, feature rich Scroll widget for Flutter.
 
 # TODO
 
