@@ -78,7 +78,6 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO hide scrollbar if not necessary
     return Positioned(
       top: marginTop,
       left: offsetLeft,
@@ -254,7 +253,6 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO hide scrollbar if not necessary
     return Positioned(
       top: offsetTop,
       bottom: offsetBottom,
