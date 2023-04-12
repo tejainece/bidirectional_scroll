@@ -195,7 +195,7 @@ class HorizontalScrollbar extends StatefulWidget {
   const HorizontalScrollbar(this.controller,
       {this.height = 25,
       this.marginLeft = 0,
-      this.marginRight = 0,
+      this.marginRight = 25,
       this.offsetTop,
       this.offsetBottom = 0,
       this.trackDecoration,
@@ -316,8 +316,8 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
 
   Widget makeThumb() => widget.thumb == null
       ? Container(
-          width: height,
-          height: _getThumbWidth(),
+          width: _getThumbWidth(),
+          height: height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(height / 2),
             color: Colors.black,

@@ -1,3 +1,4 @@
+import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:bidirectional_scroll/src/controller.dart';
 import 'package:bidirectional_scroll/src/measure_size.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,14 @@ class ScrollViewport extends StatefulWidget {
   const ScrollViewport(this.child,
       {Key? key, required this.controller, this.children = const []})
       : super(key: key);
+
+  ScrollViewport.basic(this.child, {Key? key, required this.controller})
+      : children = [
+          ScrollerCanvas(controller: controller),
+          VerticalScrollbar(controller),
+          HorizontalScrollbar(controller),
+        ],
+        super(key: key);
 
   @override
   State<ScrollViewport> createState() => _ScrollViewportState();
@@ -32,7 +41,8 @@ class _ScrollViewportState extends State<ScrollViewport> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, constraint) {
-      controller.viewportOriginalSize = Size(constraint.maxWidth, constraint.maxHeight);
+      controller.viewportOriginalSize =
+          Size(constraint.maxWidth, constraint.maxHeight);
       return Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topLeft,
