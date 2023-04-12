@@ -4,17 +4,20 @@ import 'dart:math';
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:flutter/material.dart';
 
+typedef TrackMaker = Widget Function(
+    ScrollerController controller, double trackWidth);
+
 typedef ThumbMaker = Widget Function(
     ScrollerController controller, double trackWidth, double thumbLength);
 
 class VerticalScrollbar extends StatefulWidget {
   final ScrollerController controller;
   final double width;
-  final Decoration? trackDecoration;
   final double marginTop;
   final double marginBottom;
   final double? offsetRight;
   final double? offsetLeft;
+  final dynamic /* Widget | TrackMaker */ track;
   final dynamic /* Widget | ThumbMaker */ thumb;
   final bool autoHide;
   const VerticalScrollbar(this.controller,
@@ -23,7 +26,7 @@ class VerticalScrollbar extends StatefulWidget {
       this.marginBottom = 0,
       this.offsetLeft,
       this.offsetRight = 0,
-      this.trackDecoration,
+      this.track,
       this.thumb,
       this.autoHide = false,
       Key? key})
@@ -36,7 +39,6 @@ class VerticalScrollbar extends StatefulWidget {
 class _VerticalScrollbarState extends State<VerticalScrollbar> {
   ScrollerController get controller => widget.controller;
   double get width => widget.width;
-  Decoration? get trackDecoration => widget.trackDecoration;
   double get marginTop => widget.marginTop;
   double get marginBottom => widget.marginBottom;
   double? get offsetRight => widget.offsetRight;
@@ -85,53 +87,47 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
       child: StreamBuilder(
         builder: (context, snapshot) {
           if (!_show) return Container();
-          return Listener(
-            behavior: HitTestBehavior.opaque,
-            onPointerUp: (event) {
-              if (_pointer == event.pointer) return;
-              _jumpTo(event.localPosition.dy);
-            },
-            child: Container(
-              width: width,
-              height: trackLength,
-              decoration: trackDecoration,
-              child: Stack(
-                children: [
-                  // TODO cursor
-                  Positioned(
-                    top: _getThumbTop(),
-                    child: Listener(
-                      behavior: HitTestBehavior.opaque,
-                      onPointerDown: (event) {
-                        _pointer = event.pointer;
-                        if (event.buttons == 0) {
-                          // TODO
-                          return;
-                        }
-                        _panTracker = _PanTracker(
-                            anchor: controller.position,
-                            start: event.position.dy);
-                      },
-                      onPointerMove: (event) {
-                        _pointer = event.pointer;
-                        if (event.buttons == 0 || _panTracker == null) return;
-                        controller.jumpTo(_panTracker!.anchor -
-                            Offset(0, event.position.dy - _panTracker!.start));
-                      },
-                      onPointerCancel: (event) {
-                        _pointer = event.pointer;
-                        _panTracker = null;
-                      },
-                      onPointerUp: (event) {
-                        _pointer = event.pointer;
-                        _panTracker = null;
-                      },
-                      child: makeThumb(),
-                    ),
-                  )
-                ],
+          return Stack(
+            children: [
+              Listener(
+                behavior: HitTestBehavior.opaque,
+                onPointerUp: (event) {
+                  if (_pointer == event.pointer) return;
+                  _jumpTo(event.localPosition.dy);
+                },
+                child: makeTrack(),
               ),
-            ),
+              Positioned(
+                top: _getThumbTop(),
+                child: Listener(
+                  behavior: HitTestBehavior.opaque,
+                  onPointerDown: (event) {
+                    _pointer = event.pointer;
+                    if (event.buttons == 0) {
+                      // TODO
+                      return;
+                    }
+                    _panTracker = _PanTracker(
+                        anchor: controller.position, start: event.position.dy);
+                  },
+                  onPointerMove: (event) {
+                    _pointer = event.pointer;
+                    if (event.buttons == 0 || _panTracker == null) return;
+                    controller.jumpTo(_panTracker!.anchor -
+                        Offset(0, event.position.dy - _panTracker!.start));
+                  },
+                  onPointerCancel: (event) {
+                    _pointer = event.pointer;
+                    _panTracker = null;
+                  },
+                  onPointerUp: (event) {
+                    _pointer = event.pointer;
+                    _panTracker = null;
+                  },
+                  child: makeThumb(),
+                ),
+              )
+            ],
           );
         },
         stream: controller.stream,
@@ -139,12 +135,22 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
     );
   }
 
+  Widget makeTrack() => widget.track == null
+      ? Container(
+          width: width,
+          height: trackLength,
+          decoration: BoxDecoration(color: Color.fromRGBO(220, 220, 220, 1)),
+        )
+      : widget.track is TrackMaker
+          ? widget.track(controller, width)
+          : widget.track;
+
   Widget makeThumb() => widget.thumb == null
       ? Container(
           width: width,
           height: _getThumbHeight(),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(width / 2),
+            borderRadius: BorderRadius.circular(5),
             color: Colors.black,
           ),
         )
@@ -272,7 +278,6 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
               decoration: trackDecoration,
               child: Stack(
                 children: [
-                  // TODO cursor
                   Positioned(
                     left: _getThumbLeft(),
                     child: Listener(
@@ -319,7 +324,7 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
           width: _getThumbWidth(),
           height: height,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(height / 2),
+            borderRadius: BorderRadius.circular(5),
             color: Colors.black,
           ),
         )
