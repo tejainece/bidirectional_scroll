@@ -5,7 +5,7 @@ import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:flutter/material.dart';
 
 typedef TrackMaker = Widget Function(
-    ScrollerController controller, double trackWidth);
+    ScrollerController controller, double width, double height);
 
 typedef ThumbMaker = Widget Function(
     ScrollerController controller, double trackWidth, double thumbLength);
@@ -26,7 +26,7 @@ class VerticalScrollbar extends StatefulWidget {
       this.marginBottom = 0,
       this.offsetLeft,
       this.offsetRight = 0,
-      this.track,
+      this.track = defaultTrackMaker,
       this.thumb,
       this.autoHide = false,
       Key? key})
@@ -135,15 +135,9 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
     );
   }
 
-  Widget makeTrack() => widget.track == null
-      ? Container(
-          width: width,
-          height: trackLength,
-          decoration: BoxDecoration(color: Color.fromRGBO(220, 220, 220, 1)),
-        )
-      : widget.track is TrackMaker
-          ? widget.track(controller, width)
-          : widget.track;
+  Widget makeTrack() => widget.track is TrackMaker
+      ? widget.track(controller, width, trackLength)
+      : SizedBox(width: width, height: trackLength, child: widget.track);
 
   Widget makeThumb() => widget.thumb == null
       ? Container(
@@ -190,11 +184,11 @@ class _VerticalScrollbarState extends State<VerticalScrollbar> {
 class HorizontalScrollbar extends StatefulWidget {
   final ScrollerController controller;
   final double height;
-  final Decoration? trackDecoration;
   final double marginLeft;
   final double marginRight;
   final double? offsetTop;
   final double? offsetBottom;
+  final dynamic /* Widget | TrackMaker */ track;
   final dynamic /* Widget | ThumbMaker */ thumb;
   final bool autoHide;
 
@@ -204,7 +198,7 @@ class HorizontalScrollbar extends StatefulWidget {
       this.marginRight = 25,
       this.offsetTop,
       this.offsetBottom = 0,
-      this.trackDecoration,
+      this.track = defaultTrackMaker,
       this.thumb,
       this.autoHide = false,
       Key? key})
@@ -217,7 +211,6 @@ class HorizontalScrollbar extends StatefulWidget {
 class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
   ScrollerController get controller => widget.controller;
   double get height => widget.height;
-  Decoration? get trackDecoration => widget.trackDecoration;
   double get marginLeft => widget.marginLeft;
   double get marginRight => widget.marginRight;
   double? get offsetTop => widget.offsetTop;
@@ -266,58 +259,57 @@ class _HorizontalScrollbarState extends State<HorizontalScrollbar> {
       child: StreamBuilder(
         builder: (context, snapshot) {
           if (!_show) return Container();
-          return Listener(
-            behavior: HitTestBehavior.opaque,
-            onPointerUp: (event) {
-              if (_pointer == event.pointer) return;
-              _jumpTo(event.localPosition.dx);
-            },
-            child: Container(
-              width: trackLength,
-              height: height,
-              decoration: trackDecoration,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: _getThumbLeft(),
-                    child: Listener(
-                      behavior: HitTestBehavior.opaque,
-                      onPointerDown: (event) {
-                        _pointer = event.pointer;
-                        if (event.buttons == 0) {
-                          // TODO
-                          return;
-                        }
-                        _panTracker = _PanTracker(
-                            anchor: controller.position,
-                            start: event.position.dx);
-                      },
-                      onPointerMove: (event) {
-                        _pointer = event.pointer;
-                        if (event.buttons == 0 || _panTracker == null) return;
-                        controller.jumpTo(_panTracker!.anchor -
-                            Offset(event.position.dx - _panTracker!.start, 0));
-                      },
-                      onPointerCancel: (event) {
-                        _pointer = event.pointer;
-                        _panTracker = null;
-                      },
-                      onPointerUp: (event) {
-                        _pointer = event.pointer;
-                        _panTracker = null;
-                      },
-                      child: makeThumb(),
-                    ),
-                  )
-                ],
+          return Stack(
+            children: [
+              Listener(
+                behavior: HitTestBehavior.opaque,
+                onPointerUp: (event) {
+                  if (_pointer == event.pointer) return;
+                  _jumpTo(event.localPosition.dx);
+                },
+                child: makeTrack(),
               ),
-            ),
+              Positioned(
+                left: _getThumbLeft(),
+                child: Listener(
+                  behavior: HitTestBehavior.opaque,
+                  onPointerDown: (event) {
+                    _pointer = event.pointer;
+                    if (event.buttons == 0) {
+                      // TODO
+                      return;
+                    }
+                    _panTracker = _PanTracker(
+                        anchor: controller.position, start: event.position.dx);
+                  },
+                  onPointerMove: (event) {
+                    _pointer = event.pointer;
+                    if (event.buttons == 0 || _panTracker == null) return;
+                    controller.jumpTo(_panTracker!.anchor -
+                        Offset(event.position.dx - _panTracker!.start, 0));
+                  },
+                  onPointerCancel: (event) {
+                    _pointer = event.pointer;
+                    _panTracker = null;
+                  },
+                  onPointerUp: (event) {
+                    _pointer = event.pointer;
+                    _panTracker = null;
+                  },
+                  child: makeThumb(),
+                ),
+              )
+            ],
           );
         },
         stream: controller.stream,
       ),
     );
   }
+
+  Widget makeTrack() => widget.track is TrackMaker
+      ? widget.track(controller, trackLength, height)
+      : SizedBox(width: trackLength, height: height, child: widget.track);
 
   Widget makeThumb() => widget.thumb == null
       ? Container(
@@ -368,3 +360,11 @@ class _PanTracker {
 
   _PanTracker({required this.anchor, required this.start});
 }
+
+Container defaultTrackMaker(
+        ScrollerController controller, double width, double height) =>
+    Container(
+        width: width,
+        height: height,
+        decoration:
+            const BoxDecoration(color: Color.fromRGBO(220, 220, 220, 1)));

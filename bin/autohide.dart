@@ -9,10 +9,6 @@ void main() {
 
 const double scrollbarWidth = 8;
 final controller = ScrollerController();
-final trackDecoration = BoxDecoration(
-    color: const Color.fromRGBO(215, 215, 215, 1),
-    border: Border.all(color: Colors.black54),
-    borderRadius: BorderRadius.circular(scrollbarWidth / 2));
 Widget vThumbMaker(
         ScrollerController controller, double trackWidth, double thumbLength) =>
     Container(
@@ -52,13 +48,11 @@ class MyApp extends StatelessWidget {
             ScrollerCanvas(controller: controller),
             VerticalScrollbar(controller,
                 width: scrollbarWidth,
-                trackDecoration: trackDecoration,
                 thumb: vThumbMaker,
                 autoHide: true),
             HorizontalScrollbar(controller,
                 height: scrollbarWidth,
                 marginRight: scrollbarWidth,
-                trackDecoration: trackDecoration,
                 thumb: hThumbMaker,
                 autoHide: true),
           ],
