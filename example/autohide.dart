@@ -47,9 +47,7 @@ class MyApp extends StatelessWidget {
           children: [
             ScrollerCanvas(controller: controller),
             VerticalScrollbar(controller,
-                width: scrollbarWidth,
-                thumb: vThumbMaker,
-                autoHide: true),
+                width: scrollbarWidth, thumb: vThumbMaker, autoHide: true),
             HorizontalScrollbar(controller,
                 height: scrollbarWidth,
                 marginRight: scrollbarWidth,

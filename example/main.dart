@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Scroller basic',
       home: Scaffold(
-        body: ScrollViewport.basic(ContentWidget(), controller: controller),
+        body:
+            ScrollViewport.basic(const ContentWidget(), controller: controller),
       ),
     );
   }

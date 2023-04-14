@@ -1,6 +1,6 @@
 # bidirectional_scroll
 
-A flexible, highly customizable, feature rich Scroll widget for Flutter.
+A highly customizable, feature rich Scroll widget for Flutter.
 
 # Features
 

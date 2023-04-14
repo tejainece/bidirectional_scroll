@@ -1,5 +1,4 @@
 import 'package:bidirectional_scroll/bidirectional_scroll.dart';
-import 'package:bidirectional_scroll/src/controller.dart';
 import 'package:bidirectional_scroll/src/measure_size.dart';
 import 'package:flutter/material.dart';
 
