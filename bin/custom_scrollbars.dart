@@ -25,7 +25,7 @@ Widget vThumbMaker(
     Container(
       width: trackWidth * 0.5,
       height: thumbLength - 6,
-      margin: EdgeInsets.symmetric(horizontal: trackWidth * 0.1, vertical: 2),
+      margin: EdgeInsets.symmetric(horizontal: trackWidth * 0.25, vertical: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(trackWidth),
         color: Colors.black,
@@ -36,7 +36,7 @@ Widget hThumbMaker(
   return Container(
     width: thumbLength - 6,
     height: trackWidth * 0.5,
-    margin: EdgeInsets.symmetric(horizontal: 2, vertical: trackWidth * 0.1),
+    margin: EdgeInsets.symmetric(horizontal: 2, vertical: trackWidth * 0.25),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(trackWidth),
       color: Colors.black,

@@ -12,4 +12,8 @@ A flexible, highly customizable, feature rich Scroll widget for Flutter.
 
 # TODO
 
-+ Middle button pan scrolling
++ Native styles scrollbars
+  + MacOS
+  + iPhone
+  + Android
+  + Windows

@@ -78,8 +78,17 @@ class _ScrollerCanvasState extends State<ScrollerCanvas> {
               controller.jumpTo(_panTracker!.anchor + event.localPan);
             }
           },
+          onPointerCancel: (event) {
+            _panTracker = null;
+          },
+          onPointerPanZoomEnd: (event) {
+            _panTracker = null;
+          },
           onPointerSignal: (event) {
             if (event is PointerScrollEvent) {
+              if (_panTracker != null) {
+                return;
+              }
               if (event.scrollDelta.dy.isNegative) {
                 if (_isShiftKeyPressed) {
                   controller.scrollLeft();
@@ -101,6 +110,9 @@ class _ScrollerCanvasState extends State<ScrollerCanvas> {
           },
           onPointerDown: (event) {
             _focusNode.requestFocus();
+            if (event.buttons & (kPrimaryMouseButton | kTertiaryButton) == 0) {
+              return;
+            }
             _panTracker =
                 _PanTracker(anchor: controller.position, start: event.position);
           },
