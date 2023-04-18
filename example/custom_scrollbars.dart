@@ -53,15 +53,15 @@ class MyApp extends StatelessWidget {
       title: 'Scroller basic',
       home: Scaffold(
         body: ScrollViewport(
-          const ContentWidget(),
+          child: const ContentWidget(),
           controller: controller,
           children: [
-            ScrollerCanvas(controller: controller),
-            VerticalScrollbar(controller,
+            (c) => ScrollerCanvas(controller: c),
+            (c) => VerticalScrollbar(controller,
                 width: scrollbarWidth,
                 track: trackDecoration,
                 thumb: vThumbMaker),
-            HorizontalScrollbar(controller,
+            (c) => HorizontalScrollbar(controller,
                 height: scrollbarWidth,
                 marginRight: scrollbarWidth,
                 track: trackDecoration,

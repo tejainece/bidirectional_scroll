@@ -42,13 +42,13 @@ class MyApp extends StatelessWidget {
       title: 'Scroller autohide',
       home: Scaffold(
         body: ScrollViewport(
-          const ContentWidget(),
+          child: const ContentWidget(),
           controller: controller,
           children: [
-            ScrollerCanvas(controller: controller),
-            VerticalScrollbar(controller,
+            (c) => ScrollerCanvas(controller: controller),
+            (c) => VerticalScrollbar(controller,
                 width: scrollbarWidth, thumb: vThumbMaker, autoHide: true),
-            HorizontalScrollbar(controller,
+            (c) => HorizontalScrollbar(controller,
                 height: scrollbarWidth,
                 marginRight: scrollbarWidth,
                 thumb: hThumbMaker,

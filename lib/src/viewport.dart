@@ -2,24 +2,38 @@ import 'package:bidirectional_scroll/bidirectional_scroll.dart';
 import 'package:bidirectional_scroll/src/measure_size.dart';
 import 'package:flutter/material.dart';
 
+typedef ControlMaker = Widget Function(ScrollerController controller);
+
 class ScrollViewport extends StatefulWidget {
-  final List<Widget> children;
+  final List<ControlMaker> children;
 
   final Widget child;
 
   final ScrollerController controller;
 
-  const ScrollViewport(this.child,
-      {Key? key, required this.controller, this.children = const []})
+  final bool disposeController;
+
+  const ScrollViewport(
+      {Key? key,
+      required this.controller,
+      this.children = const [],
+      required this.child,
+      this.disposeController = false})
       : super(key: key);
 
-  ScrollViewport.basic(this.child, {Key? key, required this.controller})
-      : children = [
-          ScrollerCanvas(controller: controller),
-          VerticalScrollbar(controller),
-          HorizontalScrollbar(controller),
-        ],
-        super(key: key);
+  factory ScrollViewport.basic(
+      {Key? key,
+      ScrollerController? controller,
+      List<ControlMaker> children = const [],
+      required Widget child}) {
+    final c = controller ?? ScrollerController();
+    return ScrollViewport(
+        key: key,
+        controller: c,
+        children: children,
+        disposeController: controller == null,
+        child: child);
+  }
 
   @override
   State<ScrollViewport> createState() => _ScrollViewportState();
@@ -61,9 +75,17 @@ class _ScrollViewportState extends State<ScrollViewport> {
               ),
             ),
           ),
-          ...widget.children,
+          ...widget.children.map((e) => e(controller)),
         ],
       );
     });
+  }
+
+  @override
+  void dispose() {
+    if (widget.disposeController) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 }
