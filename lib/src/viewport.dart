@@ -26,11 +26,17 @@ class ScrollViewport extends StatefulWidget {
       ScrollerController? controller,
       List<ControlMaker> children = const [],
       required Widget child}) {
-    final c = controller ?? ScrollerController();
+    final c =
+        controller ?? ScrollerController(marginBottom: 25, marginRight: 25);
     return ScrollViewport(
         key: key,
         controller: c,
-        children: children,
+        children: [
+          (c) => ScrollerCanvas(controller: c),
+          (c) => VerticalScrollbar(c),
+          (c) => HorizontalScrollbar(c),
+          ...children,
+        ],
         disposeController: controller == null,
         child: child);
   }

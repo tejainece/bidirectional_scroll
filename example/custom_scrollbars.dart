@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
       title: 'Scroller basic',
       home: Scaffold(
         body: ScrollViewport(
-          child: const ContentWidget(),
           controller: controller,
           children: [
             (c) => ScrollerCanvas(controller: c),
@@ -67,6 +66,7 @@ class MyApp extends StatelessWidget {
                 track: trackDecoration,
                 thumb: hThumbMaker),
           ],
+          child: const ContentWidget(),
         ),
       ),
     );

@@ -7,8 +7,6 @@ void main() {
   runApp(const MyApp());
 }
 
-final controller = ScrollerController(marginBottom: 25, marginRight: 25);
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -17,8 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Scroller basic',
       home: Scaffold(
-        body: ScrollViewport.basic(
-            controller: controller, child: const ContentWidget()),
+        body: ScrollViewport.basic(child: const ContentWidget()),
       ),
     );
   }

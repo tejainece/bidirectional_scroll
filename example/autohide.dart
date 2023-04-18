@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
       title: 'Scroller autohide',
       home: Scaffold(
         body: ScrollViewport(
-          child: const ContentWidget(),
           controller: controller,
           children: [
             (c) => ScrollerCanvas(controller: controller),
@@ -54,6 +53,7 @@ class MyApp extends StatelessWidget {
                 thumb: hThumbMaker,
                 autoHide: true),
           ],
+          child: const ContentWidget(),
         ),
       ),
     );
