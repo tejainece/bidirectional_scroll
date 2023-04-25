@@ -212,8 +212,6 @@ class ScrollerController {
   void dispose() {
     _tracker?.cancel();
     _controller.close();
-    _controller.add(this);
-    _setPosition(position);
   }
 }
 

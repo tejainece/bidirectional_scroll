@@ -1,3 +1,7 @@
+# 2.0.2
+
++ `ScrollerController.dispose` bug fix
+
 # 2.0.1
 
 + Fixed `ScrollViewport.basic`
