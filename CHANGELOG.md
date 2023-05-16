@@ -1,3 +1,7 @@
+# 2.0.3
+
++ Fix for Flutter 3.11
+
 # 2.0.2
 
 + `ScrollerController.dispose` bug fix

@@ -1,6 +1,6 @@
 name: bidirectional_scroll
 description: A highly customizable, feature rich Scroll widget for Flutter.
-version: 2.0.2
+version: 2.0.3
 repository: https://github.com/tejainece/bidirectional_scroll
 
 environment:

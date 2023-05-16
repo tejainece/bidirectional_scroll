@@ -67,6 +67,7 @@ class _ScrollViewportState extends State<ScrollViewport> {
         alignment: Alignment.topLeft,
         children: [
           StreamBuilder(
+            stream: controller.stream,
             builder: (ctx, _) => Positioned(
               left: controller.position.dx,
               top: controller.position.dy,
